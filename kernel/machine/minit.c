@@ -22,9 +22,9 @@ extern void s_start();
 // M-mode trap entry point, added @lab1_2
 extern void mtrapvec();
 
-// htif is defined in spike_interface/spike_htif.c, marks the availability of HTIF
+// htif is defined in kernel/machine/spike_htif.c, marks the availability of HTIF
 extern uint64 htif;
-// g_mem_size is defined in spike_interface/spike_memory.c, size of the emulated memory
+// g_mem_size is defined in kernel/machine/spike_memory.c, size of the emulated memory
 extern uint64 g_mem_size;
 // struct riscv_regs is define in kernel/riscv.h, and g_itrframe is used to save
 // registers when interrupt hapens in M mode. added @lab1_2
@@ -39,11 +39,11 @@ riscv_regs g_itrframe;
 // platform simulated using Spike.
 //
 void init_dtb(uint64 dtb) {
-  // defined in spike_interface/spike_htif.c, enabling Host-Target InterFace (HTIF)
+  // defined in kernel/machine/spike_htif.c, enabling Host-Target InterFace (HTIF)
   query_htif(dtb);
   if (htif) sprint("HTIF is available!\r\n");
 
-  // defined in spike_interface/spike_memory.c, obtain information about emulated memory
+  // defined in kernel/machine/spike_memory.c, obtain information about emulated memory
   query_mem(dtb);
   sprint("(Emulated) memory size: %ld MB\n", g_mem_size >> 20);
 }
