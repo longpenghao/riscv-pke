@@ -20,6 +20,7 @@ smode_trap_vector:
     csrrw a0, sscratch, a0
 
     # save the context (user registers) of current process in its trapframe.
+    # 保存进程上下文
     addi t6, a0 , 0
 
     # store_all_registers is a macro defined in util/load_store.S, it stores contents
@@ -28,6 +29,7 @@ smode_trap_vector:
 
     # come back to save a0 register before entering trap handling in trapframe
     # [t0]=[sscratch]
+    # 将寄存器a0中的系统调用号保存到内存堆栈
     csrr t0, sscratch
     sd t0, 72(a0)
 
