@@ -20,9 +20,9 @@ __attribute__((aligned(16))) char stack0[4096 * NCPU];
 // sstart() is the supervisor state entry point defined in kernel/kernel.c
 extern void s_start();
 
-// htif is defined in kernel/machine/spike_htif.c, marks the availability of HTIF
+// htif is defined in spike_interface/spike_htif.c, marks the availability of HTIF
 extern uint64 htif;
-// g_mem_size is defined in kernel/machine/spike_memory.c, size of the emulated memory
+// g_mem_size is defined in spike_interface/spike_memory.c, size of the emulated memory
 extern uint64 g_mem_size;
 
 //
@@ -34,11 +34,11 @@ extern uint64 g_mem_size;
 // platform simulated using Spike.
 //
 void init_dtb(uint64 dtb) {
-  // defined in kernel/machine/spike_htif.c, enabling Host-Target InterFace (HTIF)
+  // defined in spike_interface/spike_htif.c, enabling Host-Target InterFace (HTIF)
   query_htif(dtb);
   if (htif) sprint("HTIF is available!\r\n");
 
-  // defined in kernel/machine/spike_memory.c, obtain information about emulated memory
+  // defined in spike_interface/spike_memory.c, obtain information about emulated memory
   query_mem(dtb);
   sprint("(Emulated) memory size: %ld MB\n", g_mem_size >> 20);
 }
