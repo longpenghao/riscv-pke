@@ -24,8 +24,8 @@ static void handle_syscall(trapframe *tf) {
   // problems in later experiments!
   //panic( "call do_syscall to accomplish the syscall and lab1_1 here.\n" );
   long returncode = do_syscall(tf->regs.a0, tf->regs.a1, tf->regs.a2, 
-                               tf->regs.a3, tf->regs.a4, tf->regs.a5, 
-                               tf->regs.a6,tf->regs.a7);
+                         tf->regs.a3, tf->regs.a4, tf->regs.a5, 
+                         tf->regs.a6,tf->regs.a7);
   tf->regs.a0 = returncode;
 
 }
@@ -45,7 +45,6 @@ void smode_trap_handler(void) {
 
   // if the cause of trap is syscall from user application.
   // read_csr() and CAUSE_USER_ECALL are macros defined in kernel/riscv.h
-  // 如果是系统调用就调用handle_syscall()
   if (read_csr(scause) == CAUSE_USER_ECALL) {
     handle_syscall(current->trapframe);
   } else {
