@@ -76,3 +76,13 @@ int fork() {
 void yield() {
   do_user_call(SYS_user_yield, 0, 0, 0, 0, 0, 0, 0);
 }
+
+//
+// lib call to wait
+//
+int wait(int pid) {
+    for (;;) {
+        int r = do_user_call(SYS_user_wait, pid, 0, 0, 0, 0, 0, 0);
+        if (r != -2) return r; else yield();
+    }
+}
