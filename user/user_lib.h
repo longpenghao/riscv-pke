@@ -8,4 +8,5 @@ void* naive_malloc();
 void naive_free(void* va);
 int fork();
 void yield();
+// 添加wait()函数
 int wait(int);

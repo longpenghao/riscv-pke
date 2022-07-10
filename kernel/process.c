@@ -208,11 +208,15 @@ int do_fork( process* parent)
         child->total_mapped_region++;
         break;
       case DATA_SEGMENT:
+        // 完成子进程对父进程的数据段的复制，并将子进程的所有虚拟页帧都映射到新的物理页帧
         for( int j=0; j<parent->mapped_info[i].npages; j++ ){
-            uint64 addr = lookup_pa(parent->pagetable, parent->mapped_info[i].va+j*PGSIZE);
-            char *newaddr = alloc_page(); memcpy(newaddr, (void *)addr, PGSIZE);
+            uint64 parent_pa = lookup_pa(parent->pagetable, parent->mapped_info[i].va+j*PGSIZE);
+            if(parent_pa){
+            char *newproc = alloc_page();
+            memcpy(newproc, (void *)parent_pa, PGSIZE);
             map_pages(child->pagetable, parent->mapped_info[i].va+j*PGSIZE, PGSIZE,
-                    (uint64)newaddr, prot_to_type(PROT_WRITE | PROT_READ, 1));
+                    (uint64)newproc, prot_to_type(PROT_WRITE | PROT_READ | PROT_EXEC, 1));
+            }
         }
 
         // after mapping, register the vm region (do not delete codes below!)
@@ -233,27 +237,38 @@ int do_fork( process* parent)
   return child->pid;
 }
 
-// wait child process exit
-// pid == -1 means waiting for any child to exit
-// pid > 0 means waiting for the child whose pid
-// equal to the parameter to exit
+// wait()
+// 当pid=-1时，父进程等待任意一个子进程退出即返回子进程的pid
+// 当pid>0时，父进程等待进程号为pid的子进程退出即返回子进程的pid
+// 如果pid不合法或pid大于0且pid对应的进程不是当前进程的子进程，返回-1
 int wait(int pid) {
     if (pid == -1) {
-        int f = 0;
-        for (int i = 0; i < NPROC; i++)
-            if (procs[i].parent == current) {
-                f = 1;
-                if (procs[i].status == ZOMBIE) {
-                    procs[i].status = FREE; return i;
-                }
-            }
-        if (f) return -2; else return -1;
-    } else if (pid < NPROC) {
-        if (procs[pid].parent != current) return -1;
-        else {
-            if (procs[pid].status == ZOMBIE) {
-                procs[pid].status = FREE; return pid;
-            } else  return -2;
-        }
-    } else return -1;
+      //当pid=-1时
+      int signal = 0;
+      for (int i = 0; i < NPROC; i++)
+          if (procs[i].parent == current) {
+              signal = 1;
+              if (procs[i].status == ZOMBIE) {
+                  procs[i].status = FREE; return i;
+              }
+          }
+      // 当存在子进程并且所有子进程都未退出时，返回-2，通过yield()函数调用并执行其他用户进程
+      // 当存在子进程并且存在子进程已经退出时，返回该子进程的pid
+      // 当不存在子进程时，返回-2
+      if (signal) return -2; else return -1;
+    }
+    else if (pid < NPROC) {
+      // 当pid>0且合法时
+      // 当子进程的父进程不是当前进程时，返回-1
+      // 当子进程的父进程是当前进程时，如果存在子进程已经退出，则返回子进程的pid；
+      // 否则，返回-2通过yield()函数调用并执行其他用户进程
+      if (procs[pid].parent != current) return -1;
+      else {
+          if (procs[pid].status == ZOMBIE) {
+              procs[pid].status = FREE; return pid;
+          } else  return -2;
+      }
+    }
+    // 当pid不合法时，返回-1
+    else return -1;
 }

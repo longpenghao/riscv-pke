@@ -77,9 +77,11 @@ void yield() {
   do_user_call(SYS_user_yield, 0, 0, 0, 0, 0, 0, 0);
 }
 
-//
-// lib call to wait
-//
+// wait()
+// 调用内核态的wait()函数，其中通过a1寄存器传递进程的pid
+// 当返回值不为-2时，返回进程号
+// 当返回值为-2时，通过表示等待的子进程存在，但是还没有退出
+// 通过yield()函数调用并执行其他用户进程
 int wait(int pid) {
     for (;;) {
         int r = do_user_call(SYS_user_wait, pid, 0, 0, 0, 0, 0, 0);

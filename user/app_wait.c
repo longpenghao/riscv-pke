@@ -18,13 +18,16 @@ int main(void) {
         if (pid == 0) {
             flag = 2;
             printu("Grandchild process end, flag = %d.\n", flag);
+            printu("Grandchild process end, pid = %d.\n", pid);
         } else {
             wait(pid);
             printu("Child process end, flag = %d.\n", flag);
+            printu("Child process end, pid = %d.\n", pid);
         }
     } else {
         wait(-1);
         printu("Parent process end, flag = %d.\n", flag);
+        printu("Parent process end, pid = %d.\n", pid);
     }
     exit(0);
     return 0;
