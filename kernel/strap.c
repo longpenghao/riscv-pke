@@ -67,7 +67,7 @@ void handle_user_page_fault(uint64 mcause, uint64 sepc, uint64 stval) {
       // 缺页异常：当却也得逻辑地址比USER_STACK_TOP大时，分配一个物理页
 
       void* pa = alloc_page();
-      user_vm_map(current->pagetable, stval / (PGSIZE) * (PGSIZE), PGSIZE, (uint64)(pa), prot_to_type(PROT_WRITE | PROT_READ, 1));
+      user_vm_map(current->pagetable, stval  & 0xfffffffffffff000, PGSIZE, (uint64)(pa), prot_to_type(PROT_WRITE | PROT_READ, 1));
 
       break;
     default:
