@@ -84,7 +84,7 @@ void yield() {
 // 通过yield()函数调用并执行其他用户进程
 int wait(int pid) {
     for (;;) {
-        int r = do_user_call(SYS_user_wait, pid, 0, 0, 0, 0, 0, 0);
-        if (r != -2) return r; else yield();
+        int res = do_user_call(SYS_user_wait, pid, 0, 0, 0, 0, 0, 0);
+        if (res != -2) return res; else yield();
     }
 }
